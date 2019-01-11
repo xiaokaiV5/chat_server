@@ -11,7 +11,7 @@ myDB::myDB()
 }
 
 myDB::~myDB()
-{
+{ 
 	if (!mysql)
 	{
 		mysql_close(mysql);
