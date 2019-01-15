@@ -13,11 +13,15 @@ int main()
 {
 	cout << "The process start!!!" << endl;
 
-	comm comm_server;
-
 	myDB db;
-	db.Init_DB("127.0.0.1", "root", "123456", "chatServer");
-	db.ExeSQL("SELECT * from account_info");
+	db.Init_DB("localhost", "root", "123456", "chatServer");
+	db.ExeSQL("SELECT * FROM account_info WHERE account=\"miaoyu\"");
+
+	comm comm_server;
+	comm_server.comm_init();
+	comm_server.thread_accept();
+
+
 
     return 0;
 }

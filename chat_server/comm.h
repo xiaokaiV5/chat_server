@@ -7,7 +7,7 @@
 using namespace std;
 
 #define MAX_onlineUser	1024 //Limit the number of online users
-#define LISTEN_PORT		1000	//As tcp server, listen port 
+#define LISTEN_PORT		1000	//As tcp server, default listen port 
 #define LISTEN_QUEUE	5	//listen queue
 
 
@@ -17,10 +17,11 @@ public:
 	comm();
 	~comm();
 	int comm_init();
-	void *thread_accept();
-	void *thread_process_accept(void * arg);
-	void comm_listen();
+	int comm_init(uint16_t port);
 
+	void *thread_accept();
+	bool thread_processAccept(int sock_cli);
+	void process_accept(void * arg);
 
 public:
 	int socket_AsS;//listen socket
