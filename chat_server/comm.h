@@ -10,6 +10,7 @@ using namespace std;
 #define LISTEN_PORT		1000	//As tcp server, default listen port 
 #define LISTEN_QUEUE	5	//listen queue
 
+#define d_data_len	4096	//the max length of one message.
 
 class comm
 {
@@ -25,6 +26,7 @@ public:
 
 public:
 	int socket_AsS;//listen socket
+	int socket_AsS_c;	//accept client socket fd
 	int onlineUser;
 protected:
 	

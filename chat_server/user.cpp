@@ -3,6 +3,7 @@
 
 #include "user.h"
 #include "myDB.h"
+#include "define.h"
 userInfo::userInfo()
 {
 
@@ -10,14 +11,14 @@ userInfo::userInfo()
 
 userInfo::~userInfo()
 {
-	//cout << "user " << " " << "delete himself!!!" << endl;
+	//myCout << "user " << " " << "delete himself!!!" << endl;
 }
 
 bool userInfo::checking_account(string account)
 {
 	string account_stored = this->get_Account_name(2);
 
-	cout << "account : " << account << endl;
+	myCout << "account : " << account << endl;
 	return false;
 }
 
@@ -29,12 +30,12 @@ bool userInfo::checkPasswd(string passwd)
 	//if (passwd == this->posswd)// correct
 	if(passwd.c_str() == passwd_Stored.c_str())
 	{
-		cout << "The passwd is correct! " << endl;
+		myCout << "The passwd is correct! " << endl;
 		ret = true;
 	}
 	else
 	{
-		cout << "Passwd error! " << endl;
+		myCout << "Passwd error! " << endl;
 		ret = false;
 	}
 	return ret;

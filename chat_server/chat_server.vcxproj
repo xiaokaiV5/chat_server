@@ -83,6 +83,7 @@
   <ItemGroup>
     <ClInclude Include="base_sock.h" />
     <ClInclude Include="comm.h" />
+    <ClInclude Include="define.h" />
     <ClInclude Include="myDB.h" />
     <ClInclude Include="user.h" />
   </ItemGroup>

@@ -12,7 +12,7 @@
 
 #include "comm.h"
 #include "user.h"
-
+#include "define.h"
 
 comm::comm()
 {
@@ -41,7 +41,7 @@ int comm::comm_init()
 	this->socket_AsS = socket(PF_INET, SOCK_STREAM, 0);
 	if (this->socket_AsS < 0)
 	{
-		perror("socket error");
+		myCout << "socket error" << endl;
 		return 1;
 	}
 	//
@@ -49,59 +49,61 @@ int comm::comm_init()
 	/*将套接字绑定到服务器的网络地址上*/
 	if (bind(this->socket_AsS, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) < 0)
 	{
-		perror("bind error");
+		myCout << "bind error" << endl;
 		return 1;
 	}
 
 	/*监听连接请求--监听队列长度为5*/
 	if (listen(this->socket_AsS, LISTEN_QUEUE) < 0)
 	{
-		perror("listen error");
+		myCout << "listen error" << endl;
 		return 1;
 	};
 
 
-	cout << "create thread to accept tcp client accept!" << endl;
-	//pthread_create(&this->tid, NULL, this->thread_accept, NULL);====
+	myCout << "create thread to accept tcp client accept!" << endl;
+	//pthread_create(&this->tid, NULL, this->thread_accept, NULL);
 	return 0;
 }
 
 int comm::comm_init(uint16_t port)
 {
+
 	//int server_sockfd;//服务器端套接字
 	struct sockaddr_in my_addr;   //服务器网络地址结构体
 
 	memset(&my_addr, 0, sizeof(my_addr)); //数据初始化--清零
 	my_addr.sin_family = AF_INET; //设置为IP通信
 	my_addr.sin_addr.s_addr = INADDR_ANY;//服务器IP地址--允许连接到所有本地地址上
-	my_addr.sin_port = htons(LISTEN_PORT); //服务器端口号
+	my_addr.sin_port = htons(port); //服务器端口号
 
 	/*创建服务器端套接字--IPv4协议，面向连接通信，TCP协议*/
 	this->socket_AsS = socket(PF_INET, SOCK_STREAM, 0);
 	if (this->socket_AsS < 0)
 	{
-		perror("socket error");
+		myCout << "socket error" << endl;
 		return 1;
 	}
-	//
+	int reuse = 1;
+	setsockopt(this->socket_AsS, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(int));
 
 	/*将套接字绑定到服务器的网络地址上*/
 	if (bind(this->socket_AsS, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) < 0)
 	{
-		perror("bind error");
+		myCout << "bind error" << endl;
 		return 1;
 	}
 
 	/*监听连接请求--监听队列长度为5*/
 	if (listen(this->socket_AsS, LISTEN_QUEUE) < 0)
 	{
-		perror("listen error");
+		myCout<<"listen error"<<endl;
 		return 1;
 	};
 
 
-	cout << "create thread to accept tcp client accept!" << endl;
-	//pthread_create(&this->tid, NULL, this->thread_accept, NULL);====
+	myCout << "create thread to accept tcp client accept!" << endl;
+	//pthread_create(&this->tid, NULL, this->thread_accept, NULL);
 	return 0;
 }
 
@@ -114,17 +116,17 @@ void* comm::thread_accept()
 	sin_size = sizeof(struct sockaddr_in);
 	int sock_client(0);
 	//int client_sock = *(int*)(arg); 
-
+	int i = 1;
 	while (1)
 	{
 		if ((sock_client = accept(this->socket_AsS, (struct sockaddr *)&remote_addr, &sin_size)) < 0)
 		{
-			perror("accept error!\n");
+			myCout << "account error" << endl;
 		}
 		else
 		{
-			printf("accept client %s/n", inet_ntoa(remote_addr.sin_addr));
-
+			myCout << "accept client " << inet_ntoa(remote_addr.sin_addr) << endl;
+			this->socket_AsS_c = sock_client;
 			//创建线程或进程对此用户进行密码信息等检测！！！
 			thread_processAccept(sock_client);
 		}
@@ -134,12 +136,11 @@ void* comm::thread_accept()
 }
 bool comm::thread_processAccept(int sock_cli)
 {
-
-	int *ptr_sock_cli = new int(sock_cli);
-	cout << "client socket " << sock_cli;
+	myCout << "thread_processAccept" << endl;
 
 	typedef void* (*FUNC)(void*);//定义FUNC类型是一个指向函数的指针，该函数参数为void*，返回值为void*
 	FUNC callback = (FUNC)&comm::process_accept;//强制转换func()的类型
+
 	int ret = pthread_create(&this->tid, NULL, callback, this);
 	if (ret != 0)
 		return false;
@@ -151,17 +152,32 @@ bool comm::thread_processAccept(int sock_cli)
 void comm::process_accept(void *arg)
 {
 	userInfo *user = new userInfo();
-
-	user->sock_fd = *((int *)arg);
-	delete arg;
-	arg = NULL;
-
+	user->sock_fd =this->socket_AsS_c;
 	user->tid_work = std::this_thread::get_id();
-	cout << "Create thread id " << user->tid_work << " sock_cli " << user->sock_fd << endl;
+	myCout << "Create thread id " << user->tid_work << " sock_cli " << user->sock_fd << endl;
 
-	while (1)
+	char data[d_data_len] = { 0 };
+	int len = 0;
+	while ( 1 )
 	{
-		sleep(1);
+		len = read(user->sock_fd, data, sizeof(data));
+		if (len < 0)
+			myCout << "read message error!" << endl;
+		else if (len == 0)
+		{
+			cout << "user closse the socket !" << endl;
+			close(user->sock_fd);
+			//should delete user.
+			delete user;
+			user = NULL;
+			break;
+		}
+		else
+		{
+			myCout << "recv message :" << data << endl;
+		}
+		
+		//处理是注册消息还是通信消息，下线消息等
 	}
 
 }

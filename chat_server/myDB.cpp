@@ -1,13 +1,13 @@
 #include <mysql/mysql.h>
 
 #include "myDB.h"
-
+#include "define.h"
 myDB::myDB()
 {
 	mysql = mysql_init(NULL);
 	if (mysql == NULL)
 	{
-		cout << "MYSQL Error: " << mysql_error(mysql);
+		myCout << "MYSQL Error: " << mysql_error(mysql);
 		exit(-1);
 	}
 }
@@ -25,10 +25,10 @@ myDB::~myDB()
 	/*连接数据库*/
 	if (!mysql_real_connect(mysql, host.c_str(), user.c_str(), pwd.c_str(), dbname.c_str(), 0, NULL, 0))
 	{
-		cout << "connect fial: " << mysql_error(mysql);
+		myCout << "connect fial: " << mysql_error(mysql);
 		exit(-1);
 	}
-	cout << "mysql connect success!" << endl;
+	myCout << "mysql connect success!" << endl;
 	return true;
 }
 
@@ -37,7 +37,7 @@ bool myDB::ExeSQL(string sql)
 	 /*执行失败*/
 	if (mysql_query(mysql, sql.c_str()))
 	{
-		cout << "query fail: " << mysql_error(mysql);
+		myCout << "query fail: " << mysql_error(mysql);
 		exit(1);
 	}
 	else
@@ -46,15 +46,15 @@ bool myDB::ExeSQL(string sql)
 		result = mysql_store_result(mysql);
 
 		int fieldnum = mysql_num_fields(result);
-		cout << fieldnum << endl;
+		myCout << fieldnum << endl;
 
 		while (row = mysql_fetch_row(result))//while row!=NOLL
 		{
 			for (int j = 0; j < fieldnum; j++)
 			{
-				cout << row[j] << "\t\t";
+				myCout << row[j] << "\t\t";
 			}
-			cout << endl;
+			myCout << endl;
 		}
 		//for (int i = 0; i < 6; i++)
 		//{
@@ -63,9 +63,9 @@ bool myDB::ExeSQL(string sql)
 		//		break;
 		//	for (int j = 0; j < fieldnum; j++)
 		//	{
-		//		cout << row[j] << "\t\t";
+		//		myCout << row[j] << "\t\t";
 		//	}
-		//	cout << endl;
+		//	myCout << endl;
 		//}
 		mysql_free_result(result);
 	}
