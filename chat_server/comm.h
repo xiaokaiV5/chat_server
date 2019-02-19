@@ -23,6 +23,7 @@ public:
 	void *thread_accept();
 	bool thread_processAccept(int sock_cli);
 	void process_accept(void * arg);
+	void message_process(USER_DATA data);
 
 public:
 	int socket_AsS;//listen socket

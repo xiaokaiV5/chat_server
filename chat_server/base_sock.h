@@ -10,7 +10,7 @@ public:
 	~base_sock() {};
 public:
 	int sock_fd;	//与客户端通信的套接字
-	struct sockaddr_in remote_addr;//远端user ip
+	struct sockaddr_in remote_addr;//remote user ip
 private:
 
 };

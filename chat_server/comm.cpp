@@ -156,11 +156,13 @@ void comm::process_accept(void *arg)
 	user->tid_work = std::this_thread::get_id();
 	myCout << "Create thread id " << user->tid_work << " sock_cli " << user->sock_fd << endl;
 
-	char data[d_data_len] = { 0 };
+	//char data[d_data_len] = { 0 };
+	USER_DATA data;
+	//char *p = &data;
 	int len = 0;
 	while ( 1 )
 	{
-		len = read(user->sock_fd, data, sizeof(data));
+		len = read(user->sock_fd, &data, sizeof(data));
 		if (len < 0)
 			myCout << "read message error!" << endl;
 		else if (len == 0)
@@ -174,11 +176,30 @@ void comm::process_accept(void *arg)
 		}
 		else
 		{
-			myCout << "recv message :" << data << endl;
+			myCout << "recv message :" << endl;
+			//myCout << "recv message :" << data << endl;
 		}
 		
 		//处理是注册消息还是通信消息，下线消息等
 	}
+}
+
+void comm::message_process(USER_DATA data)
+{
+	switch (data.cmd)
+	{
+	case CMD_LOGIN:
+		break;
+	case CMD_REGISTER:
+		break;
+	case CMD_USERDATA:
+		break;
+	case CMD_CLOSECHAT:
+		break;
+	default:
+		break;
+	}
 
 }
+
 
