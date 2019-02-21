@@ -14,11 +14,17 @@ int main()
 	myCout<< "The process start!!!" << endl;
 
 	myDB db;
-	db.Init_DB("localhost", "root", "123456", "chatServer");
-	db.ExeSQL("SELECT * FROM account_info WHERE account=\"miaoyu\"");
-
+	db.ConnectDatabase("localhost", "root", "123456", "chatServer");
+	//db.Init_DB("localhost", "root", "123456", "chatServer");
+	//db.ExeSQL("SELECT * FROM account_info WHERE account=\"miaoyu\"");
+	db.QueryDatabase1();
 	comm comm_server;
-	comm_server.comm_init(5005);
+	if (comm_server.comm_init(LISTEN_PORT) != 0)
+	{
+		cout << "comm_init error , exit"<<endl;
+		return -1;
+	}
+		
 	comm_server.thread_accept();
 
 

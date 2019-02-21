@@ -1,5 +1,5 @@
 #include <mysql/mysql.h>
-
+#include <string.h>
 #include "myDB.h"
 #include "define.h"
 myDB::myDB()
@@ -20,15 +20,77 @@ myDB::~myDB()
 	}
 }
 
- bool myDB::Init_DB(string host, string user, string pwd, string dbname)
+//连接数据库
+bool myDB::ConnectDatabase(string host, string user, string pwd, string dbname)
 {
-	/*连接数据库*/
-	if (!mysql_real_connect(mysql, host.c_str(), user.c_str(), pwd.c_str(), dbname.c_str(), 0, NULL, 0))
+	//初始化mysql
+	mysql_init(mysql);  //连接mysql，数据库
+
+	//返回false则连接失败，返回true则连接成功
+	if (!(mysql_real_connect(mysql, host.c_str(), user.c_str(), pwd.c_str(), dbname.c_str(), 0, NULL, 0))) //中间分别是主机，用户名，密码，数据库名，端口号（可以写默认0或者3306等），可以先写成参数再传进去
 	{
 		myCout << "connect fial: " << mysql_error(mysql);
-		exit(-1);
+		return false;
 	}
-	myCout << "mysql connect success!" << endl;
+	else
+	{
+		myCout << "mysql connect success!" << endl;
+		return true;
+	}
+}
+
+//其实所有的数据库操作都是先写个sql语句，然后用mysql_query(&mysql,query)来完成，包括创建数据库或表，增删改查
+//查询数据
+bool myDB::QueryDatabase1()
+{
+	sprintf(query, "select * from %s", DB); //执行查询语句，这里是查询所有，user是表名，不用加引号，用strcpy也可以
+	mysql_query(mysql, "set names gbk"); //设置编码格式（SET NAMES GBK也行），否则cmd下中文乱码
+	//返回0 查询成功，返回1查询失败
+	if (mysql_query(mysql, query))        //执行SQL语句
+	{
+		printf("Query failed (%s)\n", mysql_error(mysql));
+		return false;
+	}
+	else
+	{
+		printf("query success\n");
+	}
+	//获取结果集
+	if (!(result = mysql_store_result(mysql)))    //获得sql语句结束后返回的结果集
+	{
+		printf("Couldn't get result from %s\n", mysql_error(mysql));
+		return false;
+	}
+
+	//打印数据行数
+	printf("number of dataline returned: %d\n", mysql_affected_rows(mysql));
+
+	int fieldnum = mysql_num_fields(result);
+	myCout << fieldnum << endl;
+
+	while (row = mysql_fetch_row(result))//while row!=NOLL
+	{
+		for (int j = 0; j < fieldnum; j++)
+		{
+			myCout << row[j] << "\t\t";
+		}
+		myCout << endl;
+	}
+
+	////获取字段的信息
+	//char *str_field[32];  //定义一个字符串数组存储字段信息
+	//for (int i = 0; i < 4; i++)   //在已知字段数量的情况下获取字段名
+	//{
+	//	str_field[i] = mysql_fetch_field(result)->name;
+	//}
+	//for (int i = 0; i < 4; i++)   //打印字段
+	//	printf("%10s\t", str_field[i]);
+	//printf("\n");
+	////打印获取的数据
+	//while (row = mysql_fetch_row(result))   //在已知字段数量情况下，获取并打印下一行
+	//{
+	//	printf("%10s\t%10s\t%10s\t%10s\n", row[0], row[1], row[2], row[3]);  //row是列数组
+	//}
 	return true;
 }
 
@@ -71,4 +133,52 @@ bool myDB::ExeSQL(string sql)
 	}
 	return true;
 }
+
+bool myDB::InsertData(ts_userInfo info)
+{
+	sprintf(query, "insert into %s (account , passwd) value (\"%s\", \"%s\");", DB, info.account, info.passwd);
+	cout << query;
+	if (mysql_query(mysql, query))        //执行SQL语句
+	{
+		printf("Query failed (%s)\n", mysql_error(mysql));
+		return false;
+	}
+	else
+	{
+		printf("Insert success\n");
+		return true;
+	}
+	return false;
+}
+//检测该账户是否存在
+bool myDB::AccountIsExists(char * account)
+{
+	int dataline = 0;
+	memset(query, 0, sizeof(query));
+	sprintf(query, "select * from %s WHERE account=\'%s\';", DB, account);
+	cout << query;
+	if (mysql_query(mysql, query))        //执行SQL语句
+	{
+		printf("Query failed (%s)\n", mysql_error(mysql));
+		return false;
+	}
+	else
+	{
+		printf("query success\n");
+		//获取结果集
+		if (!(result = mysql_store_result(mysql)))    //获得sql语句结束后返回的结果集
+		{
+			printf("Couldn't get result from %s\n", mysql_error(mysql));
+			return false;
+		}
+		//打印数据行数
+		dataline = mysql_affected_rows(mysql);
+		printf("number of dataline returned: %d\n", dataline);
+	}
+
+	return (dataline>0)?true:false;
+}
+
+
+
 

@@ -4,10 +4,11 @@
 
 #include <iostream>
 #include "base_sock.h"
+#include "user.h"
 using namespace std;
 
 #define MAX_onlineUser	1024 //Limit the number of online users
-#define LISTEN_PORT		1000	//As tcp server, default listen port 
+#define LISTEN_PORT		1001	//As tcp server, default listen port 
 #define LISTEN_QUEUE	5	//listen queue
 
 #define d_data_len	4096	//the max length of one message.

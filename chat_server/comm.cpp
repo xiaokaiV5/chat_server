@@ -16,10 +16,7 @@
 
 comm::comm()
 {
-	comm_init();
-
 	this->socket_AsS = 0;
-
 }
 
 comm::~comm()
@@ -49,7 +46,7 @@ int comm::comm_init()
 	/*将套接字绑定到服务器的网络地址上*/
 	if (bind(this->socket_AsS, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) < 0)
 	{
-		myCout << "bind error" << endl;
+		myCout << "bind error Reason:" << strerror(errno) << endl;
 		return 1;
 	}
 
@@ -85,7 +82,11 @@ int comm::comm_init(uint16_t port)
 		return 1;
 	}
 	int reuse = 1;
-	setsockopt(this->socket_AsS, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(int));
+	if (setsockopt(this->socket_AsS, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(int)) < 0)
+	{
+		cout << "setsockopt error, Reason:" << strerror(errno) << endl;
+		return 1;
+	}
 
 	/*将套接字绑定到服务器的网络地址上*/
 	if (bind(this->socket_AsS, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) < 0)
@@ -113,7 +114,7 @@ void* comm::thread_accept()
 	struct sockaddr_in remote_addr; //客户端网络地址结构体
 	socklen_t sin_size;
 	pthread_t tid;
-	sin_size = sizeof(struct sockaddr_in);
+	sin_size = sizeof(remote_addr);
 	int sock_client(0);
 	//int client_sock = *(int*)(arg); 
 	int i = 1;
@@ -121,7 +122,7 @@ void* comm::thread_accept()
 	{
 		if ((sock_client = accept(this->socket_AsS, (struct sockaddr *)&remote_addr, &sin_size)) < 0)
 		{
-			myCout << "account error" << endl;
+			myCout << "accept error, this->socket_AsS: "<< this->socket_AsS<< "Reason:" <<strerror(errno)<< endl;
 		}
 		else
 		{
@@ -176,21 +177,26 @@ void comm::process_accept(void *arg)
 		}
 		else
 		{
-			myCout << "recv message :" << endl;
-			//myCout << "recv message :" << data << endl;
+			myCout << "recv message size:" <<len << endl;
+			message_process(data);
 		}
-		
-		//处理是注册消息还是通信消息，下线消息等
 	}
 }
 
 void comm::message_process(USER_DATA data)
 {
+	userInfo user;
 	switch (data.cmd)
 	{
 	case CMD_LOGIN:
 		break;
 	case CMD_REGISTER:
+		cout << "user register!" << endl;
+		ts_userInfo info;
+		memset(&info, 0, sizeof(ts_userInfo));
+		memcpy(&info, data.data, sizeof(ts_userInfo));
+
+		user.user_register(info);
 		break;
 	case CMD_USERDATA:
 		break;
@@ -201,5 +207,7 @@ void comm::message_process(USER_DATA data)
 	}
 
 }
+
+
 
 

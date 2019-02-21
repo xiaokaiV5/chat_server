@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
-
+#include <string.h>
+#include "comm.h"
 #include "user.h"
 #include "myDB.h"
 #include "define.h"
@@ -38,6 +39,37 @@ bool userInfo::checkPasswd(string passwd)
 		myCout << "Passwd error! " << endl;
 		ret = false;
 	}
+	return ret;
+}
+
+int userInfo::user_register(ts_userInfo info)
+{
+	int ret = 0;
+	cout << "Register: account: " << info.account << " passwd: " << info.passwd << endl;
+
+	bool act_exist = false;
+	//检查此用户名在数据库是否已经存在。
+	if (AccountIsExists(info.account))
+	{
+		cout << "Account " << info.account << " already exits, register failed!" << endl;
+	} 
+	else
+	{
+		//添加到数据库
+		//return static_cast<int>(InsertData(info));
+		//添加到数据库。
+		if (true == InsertData(info))
+		{
+			cout << "Insert user to database success!" << endl;
+			ret = 0;
+		}
+		else
+		{
+			cout << "Insert user to database faie!" << endl;
+			ret = -1;
+		}
+	}
+
 	return ret;
 }
 
@@ -105,3 +137,4 @@ string baseInfo::increase_one()
 {
 	return string();
 }
+
