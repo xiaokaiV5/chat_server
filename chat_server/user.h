@@ -58,14 +58,14 @@ public:
 	~userInfo();
 	bool checking_account(string account);
 	bool checkPasswd(string passwd);
-	int user_register(ts_userInfo);
+	int user_register(MYSQL* mysqlDB, ts_userInfo);
 public:
 	thread::id tid_work;
-
+	USER_DATA data;
 protected:
-
+	
 private:
-
+	
 };
 
 

@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <stdio.h>
+#include <error.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -152,23 +153,22 @@ bool comm::thread_processAccept(int sock_cli)
 
 void comm::process_accept(void *arg)
 {
-	userInfo *user = new userInfo();
+	userInfo *user = new userInfo();//在用户下线的时候进行释放=======待释放
 	user->sock_fd =this->socket_AsS_c;
 	user->tid_work = std::this_thread::get_id();
 	myCout << "Create thread id " << user->tid_work << " sock_cli " << user->sock_fd << endl;
 
 	//char data[d_data_len] = { 0 };
-	USER_DATA data;
 	//char *p = &data;
 	int len = 0;
 	while ( 1 )
 	{
-		len = read(user->sock_fd, &data, sizeof(data));
+		len = read(user->sock_fd, &user->data, sizeof(user->data));
 		if (len < 0)
 			myCout << "read message error!" << endl;
 		else if (len == 0)
 		{
-			cout << "user closse the socket !" << endl;
+			cout << "user close the socket !" << endl;
 			close(user->sock_fd);
 			//should delete user.
 			delete user;
@@ -178,15 +178,15 @@ void comm::process_accept(void *arg)
 		else
 		{
 			myCout << "recv message size:" <<len << endl;
-			message_process(data);
+			
+			message_process(user);
 		}
 	}
 }
 
-void comm::message_process(USER_DATA data)
+void comm::message_process(userInfo *user)
 {
-	userInfo user;
-	switch (data.cmd)
+	switch (user->data.cmd)
 	{
 	case CMD_LOGIN:
 		break;
@@ -194,9 +194,14 @@ void comm::message_process(USER_DATA data)
 		cout << "user register!" << endl;
 		ts_userInfo info;
 		memset(&info, 0, sizeof(ts_userInfo));
-		memcpy(&info, data.data, sizeof(ts_userInfo));
+		memcpy(&info, &user->data, sizeof(ts_userInfo));
 
-		user.user_register(info);
+		if (0 == user->user_register(db.mysql, info))//注册成功
+		{
+			user->data.cmd = CMD_REGISTERSUCCESS;
+			strcpy(user->data.dst_id, user->data.src_id);
+			send_data(user);
+		}
 		break;
 	case CMD_USERDATA:
 		break;
@@ -205,6 +210,16 @@ void comm::message_process(USER_DATA data)
 	default:
 		break;
 	}
+
+}
+
+void comm::send_data(userInfo * user)
+{
+	if (write(user->sock_fd, &user->data, sizeof(user->data)) < 0)
+	{
+		cout << "Error:send_data failed , Reason:" << strerror(errno)<<endl;
+	}
+	
 
 }
 

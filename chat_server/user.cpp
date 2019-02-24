@@ -5,7 +5,7 @@
 #include "user.h"
 #include "myDB.h"
 #include "define.h"
-userInfo::userInfo()
+userInfo::userInfo() :myDB::myDB(), base_sock::base_sock(), baseInfo::baseInfo()
 {
 
 }
@@ -42,14 +42,14 @@ bool userInfo::checkPasswd(string passwd)
 	return ret;
 }
 
-int userInfo::user_register(ts_userInfo info)
+int userInfo::user_register(MYSQL* mysqlDB, ts_userInfo info)
 {
 	int ret = 0;
 	cout << "Register: account: " << info.account << " passwd: " << info.passwd << endl;
 
 	bool act_exist = false;
 	//检查此用户名在数据库是否已经存在。
-	if (AccountIsExists(info.account))
+	if (AccountIsExists(mysqlDB, info.account))
 	{
 		cout << "Account " << info.account << " already exits, register failed!" << endl;
 	} 
@@ -58,7 +58,7 @@ int userInfo::user_register(ts_userInfo info)
 		//添加到数据库
 		//return static_cast<int>(InsertData(info));
 		//添加到数据库。
-		if (true == InsertData(info))
+		if (true == InsertData(db.mysql, info))
 		{
 			cout << "Insert user to database success!" << endl;
 			ret = 0;

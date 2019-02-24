@@ -13,11 +13,11 @@ int main()
 {
 	myCout<< "The process start!!!" << endl;
 
-	myDB db;
-	db.ConnectDatabase("localhost", "root", "123456", "chatServer");
+	
 	//db.Init_DB("localhost", "root", "123456", "chatServer");
 	//db.ExeSQL("SELECT * FROM account_info WHERE account=\"miaoyu\"");
-	db.QueryDatabase1();
+	db.QueryDatabase1(db.mysql);
+	//db.AccountIsExists("111");
 	comm comm_server;
 	if (comm_server.comm_init(LISTEN_PORT) != 0)
 	{

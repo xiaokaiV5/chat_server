@@ -8,9 +8,8 @@
 
 using namespace std;
 
-
 #define d_sqlcmd_len	256//sql语句长度
-#define DB	"account_info"
+#define DB_TABLE	"account_info"
 
 #define USERIDSIZE      20
 #define USERDATASIZE    1000
@@ -64,21 +63,31 @@ class myDB
 {
 public:
 	myDB();
+	myDB(MYSQL* mysqlDB);
 	~myDB();
-	bool ConnectDatabase(string host, string user, string pwd, string dbname);
-	bool QueryDatabase1();
+	bool ConnectDatabase(MYSQL* mysqlDB, string host, string user, string pwd, string dbname);
+	bool QueryDatabase1(MYSQL* mysqlDB);
+	void FreeConnect(MYSQL* mysqlDB);
+	bool QueryDatabase2(MYSQL* mysqlDB);
 	//bool Init_DB(string host, string user, string pwd, string dbname);
-	bool ExeSQL(string sql);	//Online examples
-	bool InsertData(ts_userInfo info);
-	bool AccountIsExists(char *account);
+	bool InsertData(MYSQL* mysqlDB, ts_userInfo info);
+	bool AccountIsExists(MYSQL* mysqlDB, char *account);
 public:
 	char query[d_sqlcmd_len];
+	MYSQL* mysql;		//连接mysql句柄指针
+
 protected:
 	
 private:
-	MYSQL* mysql;		//连接mysql句柄指针
 	MYSQL_ROW row;		//按行返回的查询信息
 	MYSQL_RES* result;	//指向查询结果的指针
-	MYSQL_FIELD* field;
+	//MYSQL_FIELD* field;
+
+	MYSQL_FIELD *filled;  //字段列数组
+	char field[32][32];  //存字段名二维数组
 };
+
+extern myDB db;
+
+
 #endif

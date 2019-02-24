@@ -24,11 +24,12 @@ public:
 	void *thread_accept();
 	bool thread_processAccept(int sock_cli);
 	void process_accept(void * arg);
-	void message_process(USER_DATA data);
+	void message_process(userInfo *user);
+	void send_data(userInfo *user);
 
 public:
 	int socket_AsS;//listen socket
-	int socket_AsS_c;	//accept client socket fd
+	int socket_AsS_c;	//accept client socket filled
 	int onlineUser;
 protected:
 	
