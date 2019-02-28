@@ -9,7 +9,13 @@
 
 using namespace std;
 
-
+//用户状态
+enum User_state {
+	D_USER_OFFLINE,
+	D_USER_ONLINE,
+	D_USER_BUSY,
+	D_USER_Out_of_state,
+};
 
 enum Sex_type
 {
@@ -58,10 +64,13 @@ public:
 	~userInfo();
 	bool checking_account(string account);
 	bool checkPasswd(string passwd);
-	int user_register(MYSQL* mysqlDB, ts_userInfo);
+	int user_register(MYSQL* mysqlDB, ts_userInfo info);
+	int user_login(MYSQL* mysqlDB, ts_userInfo info);
+	int user_logout(MYSQL* mysqlDB, ts_userInfo info);
 public:
 	thread::id tid_work;
 	USER_DATA data;
+	int onlineState;	//在线状态:离线，在线，忙碌，离开。
 protected:
 	
 private:

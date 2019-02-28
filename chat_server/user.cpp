@@ -7,7 +7,7 @@
 #include "define.h"
 userInfo::userInfo() :myDB::myDB(), base_sock::base_sock(), baseInfo::baseInfo()
 {
-
+	onlineState = D_USER_OFFLINE;
 }
 
 userInfo::~userInfo()
@@ -71,6 +71,31 @@ int userInfo::user_register(MYSQL* mysqlDB, ts_userInfo info)
 	}
 
 	return ret;
+}
+
+int userInfo::user_login(MYSQL * mysqlDB, ts_userInfo info)
+{
+	cout << "login: account:" << info.account << " passwd:" << info.passwd << endl;
+
+	int log_resilt = CheckPasswd(mysqlDB, info.account, info.passwd);
+	if ( log_resilt ==0)
+	{
+		onlineState = D_USER_ONLINE;
+		cout << "CheckPasswd successful." << endl;
+	}
+	else
+	{
+		onlineState = D_USER_OFFLINE;
+		cout << "CheckPasswd failed." << endl;
+	}
+
+	return log_resilt;
+}
+
+int userInfo::user_logout(MYSQL * mysqlDB, ts_userInfo info)
+{
+
+	return 0;
 }
 
 

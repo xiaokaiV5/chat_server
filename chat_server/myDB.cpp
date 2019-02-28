@@ -104,6 +104,7 @@ bool myDB::ConnectDatabase(MYSQL* mysqlDB, string host, string user, string pwd,
 bool myDB::QueryDatabase1(MYSQL* mysqlDB)
 {
 	sprintf(query, "select * from %s", DB_TABLE); //执行查询语句，这里是查询所有，user是表名，不用加引号，用strcpy也可以
+	
 	mysql_query(mysqlDB, "set names gbk"); //设置编码格式（SET NAMES GBK也行），否则cmd下中文乱码
 	//返回0 查询成功，返回1查询失败
 	if (mysql_query(mysqlDB, query))        //执行SQL语句
@@ -116,18 +117,16 @@ bool myDB::QueryDatabase1(MYSQL* mysqlDB)
 		printf("query success\n");
 	}
 
-	/*获取结果集*/
-	result = mysql_store_result(mysql);
-
-	int fieldnum = mysql_num_fields(result);
-	myCout << fieldnum << endl;
-
 	//获取结果集
 	if (!(result = mysql_store_result(mysqlDB)))    //获得sql语句结束后返回的结果集
 	{
 		printf("Couldn't get result from %s\n", mysql_error(mysqlDB));
 		return false;
 	}
+
+	int fieldnum = mysql_num_fields(result);
+	myCout << fieldnum << endl;
+
 
 	//打印数据行数
 	printf("number of dataline returned: %d\n", mysql_affected_rows(mysqlDB));
@@ -143,6 +142,7 @@ bool myDB::QueryDatabase1(MYSQL* mysqlDB)
 		myCout << endl;
 	}
 
+	mysql_free_result(result);
 	return true;
 }
 
@@ -176,6 +176,8 @@ bool myDB::QueryDatabase2(MYSQL* mysqlDB)
 			printf("%10s\t", row[i]);
 		printf("\n");
 	}
+
+	mysql_free_result(result);
 	return true;
 }
 
@@ -205,6 +207,7 @@ bool myDB::InsertData(MYSQL* mysqlDB, ts_userInfo info)
 	}
 	return false;
 }
+
 //检测该账户是否存在
 bool myDB::AccountIsExists(MYSQL* mysqlDB, char * account)
 {
@@ -244,31 +247,51 @@ bool myDB::AccountIsExists(MYSQL* mysqlDB, char * account)
 	}
 
 	return lineNum > 0 ? true : false;
+}
 
-	//int dataline = 0;
-	//memset(query, 0, sizeof(query));
-	//sprintf(query, "select * from %s WHERE account=\'%s\';", DB, account);
-	//cout << query << endl;
-	//if (mysql_query(mysql, query))        //执行SQL语句
-	//{
-	//	printf("Query failed (%s)\n", mysql_error(mysql));
-	//	return false;
-	//}
-	//else
-	//{
-	//	printf("query success\n");
-	//	//获取结果集
-	//	if (!(result = mysql_store_result(mysql)))    //获得sql语句结束后返回的结果集
-	//	{
-	//		printf("Couldn't get result from %s\n", mysql_error(mysql));
-	//		return false;
-	//	}
-	//	//打印数据行数
-	//	dataline = mysql_affected_rows(mysql);
-	//	printf("number of dataline returned: %d\n", dataline);
-	//}
+int myDB::CheckPasswd(MYSQL * mysqlDB, char * account, char * passwd)
+{
+	int ret = D_DB_ERROR;
+	sprintf(query, "select account,passwd from %s where account='%s'", DB_TABLE, account);
+	if ( mysql_query(mysqlDB, query) )
+	{
+		cout << "Query failed, Reason:" << mysql_error(mysqlDB);
+		ret = D_DB_ERROR;
+	}
+	else
+	{
+		result = mysql_store_result(mysqlDB);
+		if (result)
+		{
+			int columns = mysql_num_fields(result);
+			row = mysql_fetch_row(result);
+			if (columns == 2)
+			{
+				if (0 == strncmp(passwd, row[columns - 1], max(strlen(passwd), strlen(row[columns - 1]))))
+				{
+					ret = D_PASSWD_CURRECT;
+					cout << "Passwd correct." << endl;
+				}
+				else
+				{
+					ret = D_PASSWD_ERROR;
+					cout << "Passwd error." << endl;
+				}
+			} 
+			else
+			{
+				cout << "CheckPasswd error." << endl;
+				ret = D_DB_ERROR;
+			}
+		} 
+		else
+		{
+			cout << "Couldn't get result from " << DB_TABLE << " Reason: " << mysql_error(mysqlDB);
+			ret = D_DB_ERROR;
+		}
+	}
 
-	//return (dataline>0)?true:false;
+	return ret;
 }
 
 

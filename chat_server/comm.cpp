@@ -186,24 +186,34 @@ void comm::process_accept(void *arg)
 
 void comm::message_process(userInfo *user)
 {
+	ts_userInfo info;
+	memset(&info, 0, sizeof(ts_userInfo));
+
 	switch (user->data.cmd)
 	{
 	case CMD_LOGIN:
+		cout << "user login !";
+		user->data.cmd = user->user_login(db.mysql, info);
+
+		strcpy(user->data.dst_id, user->data.src_id);
+		send_data(user);
 		break;
 	case CMD_REGISTER:
 		cout << "user register!" << endl;
-		ts_userInfo info;
-		memset(&info, 0, sizeof(ts_userInfo));
 		memcpy(&info, &user->data, sizeof(ts_userInfo));
 
-		if (0 == user->user_register(db.mysql, info))//×¢²á³É¹¦
-		{
+		if (0 == user->user_register(db.mysql, info))
+			//×¢²á³É¹¦
 			user->data.cmd = CMD_REGISTERSUCCESS;
-			strcpy(user->data.dst_id, user->data.src_id);
-			send_data(user);
-		}
+		else
+			//×¢²áÊ§°Ü
+			user->data.cmd = CMD_REGISTERFAILED;
+
+		strcpy(user->data.dst_id, user->data.src_id);
+		send_data(user);
 		break;
 	case CMD_USERDATA:
+
 		break;
 	case CMD_CLOSECHAT:
 		break;

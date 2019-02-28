@@ -33,6 +33,12 @@ using namespace std;
 
 #define DATASIZE        CMDSIZE + USERIDSIZE*2 + USERDATASIZE
 
+#define		D_ACCOUNT_INVALID		-1	//account is invalid.
+#define		D_PASSWD_ERROR			-2	//passwd error
+#define		D_DB_ERROR				-3	//datebase error or command execute failed.
+#define		D_PASSWD_CURRECT		0	//passwd is currect.
+
+
 typedef struct user_data
 {
 	unsigned char cmd;
@@ -72,6 +78,7 @@ public:
 	//bool Init_DB(string host, string user, string pwd, string dbname);
 	bool InsertData(MYSQL* mysqlDB, ts_userInfo info);
 	bool AccountIsExists(MYSQL* mysqlDB, char *account);
+	int CheckPasswd(MYSQL* mysqlDB, char *account, char *passwd);
 public:
 	char query[d_sqlcmd_len];
 	MYSQL* mysql;		//Á¬½Ómysql¾ä±úÖ¸Õë
