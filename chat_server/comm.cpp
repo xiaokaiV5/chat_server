@@ -99,7 +99,7 @@ int comm::comm_init(uint16_t port)
 	/*监听连接请求--监听队列长度为5*/
 	if (listen(this->socket_AsS, LISTEN_QUEUE) < 0)
 	{
-		myCout<<"listen error"<<endl;
+		myCout << "listen error" << endl;
 		return 1;
 	};
 
@@ -123,7 +123,7 @@ void* comm::thread_accept()
 	{
 		if ((sock_client = accept(this->socket_AsS, (struct sockaddr *)&remote_addr, &sin_size)) < 0)
 		{
-			myCout << "accept error, this->socket_AsS: "<< this->socket_AsS<< "Reason:" <<strerror(errno)<< endl;
+			myCout << "accept error, this->socket_AsS: " << this->socket_AsS << "Reason:" << strerror(errno) << endl;
 		}
 		else
 		{
@@ -154,14 +154,14 @@ bool comm::thread_processAccept(int sock_cli)
 void comm::process_accept(void *arg)
 {
 	userInfo *user = new userInfo();//在用户下线的时候进行释放=======待释放
-	user->sock_fd =this->socket_AsS_c;
+	user->sock_fd = this->socket_AsS_c;
 	user->tid_work = std::this_thread::get_id();
 	myCout << "Create thread id " << user->tid_work << " sock_cli " << user->sock_fd << endl;
 
 	//char data[d_data_len] = { 0 };
 	//char *p = &data;
 	int len = 0;
-	while ( 1 )
+	while (1)
 	{
 		len = read(user->sock_fd, &user->data, sizeof(user->data));
 		if (len < 0)
@@ -177,8 +177,8 @@ void comm::process_accept(void *arg)
 		}
 		else
 		{
-			myCout << "recv message size:" <<len << endl;
-			
+			myCout << "recv message size:" << len << endl;
+
 			message_process(user);
 		}
 	}
@@ -227,9 +227,9 @@ void comm::send_data(userInfo * user)
 {
 	if (write(user->sock_fd, &user->data, sizeof(user->data)) < 0)
 	{
-		cout << "Error:send_data failed , Reason:" << strerror(errno)<<endl;
+		cout << "Error:send_data failed , Reason:" << strerror(errno) << endl;
 	}
-	
+
 
 }
 

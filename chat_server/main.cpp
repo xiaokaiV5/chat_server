@@ -7,13 +7,15 @@
 #include "comm.h"
 #include "myDB.h"
 #include "define.h"
+#include "online_user_operate.h"
 using namespace std;
 
 int main()
-{
+{ 
 	myCout<< "The process start!!!" << endl;
 
-	
+	myHashMap OnlineUserMap;	//初始化在线用户hashMap
+
 	//db.Init_DB("localhost", "root", "123456", "chatServer");
 	//db.ExeSQL("SELECT * FROM account_info WHERE account=\"miaoyu\"");
 	db.QueryDatabase1(db.mysql);

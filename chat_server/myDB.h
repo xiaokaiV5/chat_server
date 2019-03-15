@@ -7,7 +7,7 @@
 #include <mysql/mysql.h>
 
 using namespace std;
-
+ 
 #define d_sqlcmd_len	256//sql”Ôæ‰≥§∂»
 #define DB_TABLE	"account_info"
 

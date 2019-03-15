@@ -4,7 +4,7 @@
 #include "define.h"
 
 myDB db;
-
+ 
 myDB::myDB(MYSQL* mysqlDB)
 {
 	mysqlDB = mysql_init(NULL);

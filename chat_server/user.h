@@ -33,6 +33,7 @@ public:
 	~baseInfo();
 public:
 	string get_Account_name(int id);
+	string get_Account_name();
 	string getPasswd(string accountName);
 	time_t get_time_register(string accountName);
 	time_t get_time_login(string accountName);

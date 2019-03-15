@@ -5,6 +5,9 @@
 #include "user.h"
 #include "myDB.h"
 #include "define.h"
+#include "online_user_operate.h"
+
+
 userInfo::userInfo() :myDB::myDB(), base_sock::base_sock(), baseInfo::baseInfo()
 {
 	onlineState = D_USER_OFFLINE;
@@ -80,6 +83,7 @@ int userInfo::user_login(MYSQL * mysqlDB, ts_userInfo info)
 	int log_resilt = CheckPasswd(mysqlDB, info.account, info.passwd);
 	if ( log_resilt ==0)
 	{
+
 		onlineState = D_USER_ONLINE;
 		cout << "CheckPasswd successful." << endl;
 	}
@@ -107,9 +111,15 @@ baseInfo::~baseInfo()
 {
 }
 
+//函数设计：根据id从整个数据库查到用户名
 string baseInfo::get_Account_name(int id)
 {
 	return string();
+}
+//返回此用户的用户名
+string baseInfo::get_Account_name()
+{
+	return this->account_name;
 }
 string baseInfo::getPasswd(string accountName)
 {

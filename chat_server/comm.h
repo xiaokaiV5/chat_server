@@ -12,7 +12,7 @@ using namespace std;
 #define LISTEN_QUEUE	5	//listen queue
 
 #define d_data_len	4096	//the max length of one message.
-
+ 
 class comm
 {
 public:

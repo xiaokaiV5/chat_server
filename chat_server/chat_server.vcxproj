@@ -78,6 +78,7 @@
     <ClCompile Include="comm.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="myDB.cpp" />
+    <ClCompile Include="online_user_operate.cpp" />
     <ClCompile Include="user.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -85,6 +86,7 @@
     <ClInclude Include="comm.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="myDB.h" />
+    <ClInclude Include="online_user_operate.h" />
     <ClInclude Include="user.h" />
   </ItemGroup>
   <ItemGroup>
