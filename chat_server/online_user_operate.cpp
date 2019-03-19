@@ -3,6 +3,9 @@
 
 using namespace std;
 #define d_bucket_num	1000	//初始化hash桶的数量
+
+myHashMap gc_OnlineUserMap;
+
 myHashMap::myHashMap()
 {
 	HashMap mapOnline(d_bucket_num);

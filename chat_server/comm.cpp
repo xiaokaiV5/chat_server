@@ -14,6 +14,7 @@
 #include "comm.h"
 #include "user.h"
 #include "define.h"
+#include "online_user_operate.h"
 
 comm::comm()
 {
@@ -129,18 +130,18 @@ void* comm::thread_accept()
 		{
 			myCout << "accept client " << inet_ntoa(remote_addr.sin_addr) << endl;
 			this->socket_AsS_c = sock_client;
-			//创建线程或进程对此用户进行密码信息等检测！！！
-			thread_processAccept(sock_client);
+			//创建线程或进程管理用户注册上线消息转发等行为
+			this->thread_processAccept(sock_client);
 		}
 	}
 
 	return NULL;
 }
+typedef void* (*FUNC)(void*);//定义FUNC类型是一个指向函数的指针，该函数参数为void*，返回值为void*
 bool comm::thread_processAccept(int sock_cli)
 {
 	myCout << "thread_processAccept" << endl;
 
-	typedef void* (*FUNC)(void*);//定义FUNC类型是一个指向函数的指针，该函数参数为void*，返回值为void*
 	FUNC callback = (FUNC)&comm::process_accept;//强制转换func()的类型
 
 	int ret = pthread_create(&this->tid, NULL, callback, this);
@@ -165,14 +166,18 @@ void comm::process_accept(void *arg)
 	{
 		len = read(user->sock_fd, &user->data, sizeof(user->data));
 		if (len < 0)
+		{
 			myCout << "read message error!" << endl;
+			break;
+		}
+			
 		else if (len == 0)
 		{
 			cout << "user close the socket !" << endl;
 			close(user->sock_fd);
 			//should delete user.
 			delete user;
-			user = NULL;
+			user = nullptr;
 			break;
 		}
 		else
@@ -182,19 +187,24 @@ void comm::process_accept(void *arg)
 			message_process(user);
 		}
 	}
+	delete user;
+	user = nullptr;
 }
 
 void comm::message_process(userInfo *user)
 {
 	ts_userInfo info;
 	memset(&info, 0, sizeof(ts_userInfo));
-
+	
 	switch (user->data.cmd)
 	{
 	case CMD_LOGIN:
 		cout << "user login !";
 		user->data.cmd = user->user_login(db.mysql, info);
-
+		if (user->data.cmd == D_USER_ONLINE)
+		{
+			gc_OnlineUserMap.HashMap_Add(*user);
+		}
 		strcpy(user->data.dst_id, user->data.src_id);
 		send_data(user);
 		break;
@@ -216,6 +226,12 @@ void comm::message_process(userInfo *user)
 
 		break;
 	case CMD_CLOSECHAT:
+
+		user->data.cmd = user->user_logout(db.mysql, info);
+		if ( user->data.cmd == D_USER_ONLINE )
+		{
+			gc_OnlineUserMap.HashMap_Del(*user);
+		}
 		break;
 	default:
 		break;

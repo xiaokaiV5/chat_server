@@ -134,11 +134,10 @@ bool myDB::QueryDatabase1(MYSQL* mysqlDB)
 	//一行一行打印
 	while (row = mysql_fetch_row(result))//while row!=NULL
 	{
+
 		for (int j = 0; j < fieldnum; j++)
-		{
-			//一列一列打印
-			myCout << row[j] << "\t\t";
-		}
+			printf("%10s\t", row[j]);//一列一列打印
+
 		myCout << endl;
 	}
 

@@ -83,7 +83,6 @@ int userInfo::user_login(MYSQL * mysqlDB, ts_userInfo info)
 	int log_resilt = CheckPasswd(mysqlDB, info.account, info.passwd);
 	if ( log_resilt ==0)
 	{
-
 		onlineState = D_USER_ONLINE;
 		cout << "CheckPasswd successful." << endl;
 	}
@@ -98,8 +97,8 @@ int userInfo::user_login(MYSQL * mysqlDB, ts_userInfo info)
 
 int userInfo::user_logout(MYSQL * mysqlDB, ts_userInfo info)
 {
-
-	return 0;
+	
+	return D_USER_OFFLINE;
 }
 
 

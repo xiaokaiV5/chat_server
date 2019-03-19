@@ -27,7 +27,7 @@ private:
 };
 
 
-
+extern myHashMap gc_OnlineUserMap;
 
 
 #endif
