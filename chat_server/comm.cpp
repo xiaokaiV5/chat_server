@@ -164,13 +164,13 @@ void comm::process_accept(void *arg)
 	int len = 0;
 	while (1)
 	{
-		len = read(user->sock_fd, &user->data, sizeof(user->data));
+		len = read(user->sock_fd, &user->msg, sizeof(user->msg));
 		if (len < 0)
 		{
 			myCout << "read message error!" << endl;
 			break;
 		}
-			
+
 		else if (len == 0)
 		{
 			cout << "user close the socket !" << endl;
@@ -195,40 +195,41 @@ void comm::message_process(userInfo *user)
 {
 	ts_userInfo info;
 	memset(&info, 0, sizeof(ts_userInfo));
-	
-	switch (user->data.cmd)
+
+	switch (user->msg.cmd)
 	{
 	case CMD_LOGIN:
-		cout << "user login !";
-		user->data.cmd = user->user_login(db.mysql, info);
-		if (user->data.cmd == D_USER_ONLINE)
+		cout << "LOGIN: User login !" << endl;
+		memcpy(&info, &user->msg.data, sizeof(ts_userInfo));
+
+		user->user_login(db.mysql, info);
+
+		if (user->msg.cmd == CMD_LOGINSUCCESS)
 		{
 			gc_OnlineUserMap.HashMap_Add(*user);
 		}
-		strcpy(user->data.dst_id, user->data.src_id);
+		strcpy(user->msg.dst_id, user->msg.src_id);
 		send_data(user);
 		break;
 	case CMD_REGISTER:
-		cout << "user register!" << endl;
-		memcpy(&info, &user->data, sizeof(ts_userInfo));
+		cout << "REGISTER: User register!" << endl;
+		memcpy(&info, &user->msg.data, sizeof(ts_userInfo));
 
 		if (0 == user->user_register(db.mysql, info))
-			//×¢²á³É¹¦
-			user->data.cmd = CMD_REGISTERSUCCESS;
+			user->msg.cmd = CMD_REGISTERSUCCESS;	//×¢²á³É¹¦
 		else
-			//×¢²áÊ§°Ü
-			user->data.cmd = CMD_REGISTERFAILED;
+			user->msg.cmd = CMD_REGISTERFAILED;	//×¢²áÊ§°Ü
 
-		strcpy(user->data.dst_id, user->data.src_id);
+		strcpy(user->msg.dst_id, user->msg.src_id);
 		send_data(user);
 		break;
 	case CMD_USERDATA:
-
+		//gc_OnlineUserMap.HashMap_getUser(user->msg.src_id);
+		
 		break;
 	case CMD_CLOSECHAT:
-
-		user->data.cmd = user->user_logout(db.mysql, info);
-		if ( user->data.cmd == D_USER_ONLINE )
+		user->msg.cmd = user->user_logout(db.mysql, info);
+		if (user->msg.cmd == D_USER_ONLINE)
 		{
 			gc_OnlineUserMap.HashMap_Del(*user);
 		}
@@ -241,7 +242,7 @@ void comm::message_process(userInfo *user)
 
 void comm::send_data(userInfo * user)
 {
-	if (write(user->sock_fd, &user->data, sizeof(user->data)) < 0)
+	if (write(user->sock_fd, &user->msg, sizeof(user->msg)) < 0)
 	{
 		cout << "Error:send_data failed , Reason:" << strerror(errno) << endl;
 	}

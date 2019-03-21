@@ -32,7 +32,7 @@ bool userInfo::checkPasswd(string passwd)
 	string passwd_Stored = this->getPasswd("123456");
 
 	//if (passwd == this->posswd)// correct
-	if(passwd.c_str() == passwd_Stored.c_str())
+	if (passwd.c_str() == passwd_Stored.c_str())
 	{
 		myCout << "The passwd is correct! " << endl;
 		ret = true;
@@ -55,7 +55,7 @@ int userInfo::user_register(MYSQL* mysqlDB, ts_userInfo info)
 	if (AccountIsExists(mysqlDB, info.account))
 	{
 		cout << "Account " << info.account << " already exits, register failed!" << endl;
-	} 
+	}
 	else
 	{
 		//添加到数据库
@@ -80,24 +80,35 @@ int userInfo::user_login(MYSQL * mysqlDB, ts_userInfo info)
 {
 	cout << "login: account:" << info.account << " passwd:" << info.passwd << endl;
 
-	int log_resilt = CheckPasswd(mysqlDB, info.account, info.passwd);
-	if ( log_resilt ==0)
+	//if (AccountIsExists(mysqlDB, info.account))
+	//{
+	//	this->msg.cmd = CMD_REPEATLOGIN;
+	//	onlineState = D_USER_OFFLINE;
+	//	cout << "LOGIN:Account already online" << endl;
+	//}
+	if (0)
 	{
+		//检测是否已经在线，防止重复登录。
+		this->msg.cmd = CMD_REPEATLOGIN;
+	}
+	else if (!CheckPasswd(mysqlDB, info.account, info.passwd))
+	{
+		this->msg.cmd = CMD_LOGINSUCCESS;
 		onlineState = D_USER_ONLINE;
-		cout << "CheckPasswd successful." << endl;
+		cout << "LOGIN:CheckPasswd successful." << endl;
 	}
 	else
 	{
-		onlineState = D_USER_OFFLINE;
-		cout << "CheckPasswd failed." << endl;
+		this->msg.cmd = CMD_LOGINFAILED;
+		cout << "LOGIN:Passwd error!";
 	}
 
-	return log_resilt;
+	return this->msg.cmd;
 }
 
 int userInfo::user_logout(MYSQL * mysqlDB, ts_userInfo info)
 {
-	
+
 	return D_USER_OFFLINE;
 }
 
@@ -125,7 +136,7 @@ string baseInfo::getPasswd(string accountName)
 	string passwd;
 
 	//myDB::ExeSQL();
-	return passwd;
+	return this->passwd;
 }
 
 time_t baseInfo::get_time_register(string accountName)

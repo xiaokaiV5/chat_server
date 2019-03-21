@@ -26,10 +26,8 @@ int main()
 		cout << "comm_init error , exit"<<endl;
 		return -1;
 	}
-		
+	
 	comm_server.thread_accept();
-
-
 
     return 0;
 }

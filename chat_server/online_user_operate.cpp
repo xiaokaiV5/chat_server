@@ -1,5 +1,7 @@
-#include "online_user_operate.h"
 #include <string>
+#include <string.h>
+
+#include "online_user_operate.h"
 
 using namespace std;
 #define d_bucket_num	1000	//初始化hash桶的数量
@@ -56,4 +58,16 @@ size_t myHashMap::HashMap_Size()
 {
 	cout << "uMap.cout=" << uMap.size();
 	return uMap.size();
+}
+
+userInfo myHashMap::HashMap_getUser(char * account)
+{
+	//string key = account;
+	userInfo &tmpUser = uMap[account];
+	if (strlen(account))
+	{
+		cout << tmpUser.get_Account_name() << tmpUser.getPasswd(tmpUser.get_Account_name()) << endl;
+		//return uMap[account];
+	}
+	
 }

@@ -70,7 +70,7 @@ public:
 	int user_logout(MYSQL* mysqlDB, ts_userInfo info);
 public:
 	thread::id tid_work;
-	USER_DATA data;
+	USER_DATA msg;
 	int onlineState;	//在线状态:离线，在线，忙碌，离开。
 protected:
 	

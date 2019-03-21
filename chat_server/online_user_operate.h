@@ -20,6 +20,8 @@ public:
 	void HashMap_Clear();
 	//获取在线用户的总数量
 	size_t HashMap_Size();
+	//Get info of online user by account 
+	userInfo HashMap_getUser(char *account);
 
 protected:
 private:
