@@ -112,6 +112,13 @@ int userInfo::user_logout(MYSQL * mysqlDB, ts_userInfo info)
 	return D_USER_OFFLINE;
 }
 
+int userInfo::user_tellOnline()
+{
+	this->msg.cmd = CMD_Onlineuser;
+
+	return 0;
+}
+
 
 baseInfo::baseInfo()
 {
@@ -129,6 +136,7 @@ string baseInfo::get_Account_name(int id)
 //返回此用户的用户名
 string baseInfo::get_Account_name()
 {
+	//cout << "account name: =============:" << account_name << endl;
 	return this->account_name;
 }
 string baseInfo::getPasswd(string accountName)
@@ -181,5 +189,36 @@ string baseInfo::get_AllInfo(string accountName)
 string baseInfo::increase_one()
 {
 	return string();
+}
+
+bool baseInfo::set_Account_name(string accountName)
+{
+	int ret = false;
+	if (accountName.length() > 0 && accountName.length() < 20)
+	{
+		this->account_name = accountName;
+		ret = true;
+	}
+	else
+	{
+		ret = false;
+	}
+
+	return ret;
+}
+
+bool baseInfo::set_passwd(string passwd_tmp)
+{
+	int ret = false;
+	if (passwd.size() > 0)
+	{
+		this->passwd = passwd_tmp;
+		ret = true;
+	}
+	else
+	{
+		ret = false;
+	}
+	return ret;
 }
 

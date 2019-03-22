@@ -94,8 +94,7 @@
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <Link>
-      <LibraryDependencies>mysqlclient ;pthread</LibraryDependencies>
-      <AdditionalOptions>-pthread -mysqlclient %(AdditionalOptions)</AdditionalOptions>
+      <LibraryDependencies>pthread; mysqlclient</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

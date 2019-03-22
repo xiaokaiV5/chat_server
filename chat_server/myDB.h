@@ -12,7 +12,7 @@ using namespace std;
 #define DB_TABLE	"account_info"
 
 #define USERIDSIZE      20
-#define USERDATASIZE    1000
+#define USERDATASIZE    8192
 #define MAXUSER         100
 #define CMDSIZE         1
 /* 给服务器发送的命令 */
@@ -28,7 +28,7 @@ using namespace std;
 #define CMD_REGISTERFAILED  6
 #define CMD_REGISTEREXISTS  7
 #define CMD_GetOnlineuser   8
-#define CMD_Onlineuser      9
+#define CMD_Onlineuser      9	//Upgrade the list of online user.
 #define CMD_REPEATLOGIN     11
 
 #define DATASIZE        CMDSIZE + USERIDSIZE*2 + USERDATASIZE

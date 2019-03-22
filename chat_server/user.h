@@ -44,6 +44,9 @@ public:
 	string get_AllInfo(int id);
 	string get_AllInfo(string accountName);
 	string increase_one();
+
+	bool set_Account_name(string accountName);
+	bool set_passwd(string passwd_tmp);
 protected:
 
 private:
@@ -68,6 +71,7 @@ public:
 	int user_register(MYSQL* mysqlDB, ts_userInfo info);
 	int user_login(MYSQL* mysqlDB, ts_userInfo info);
 	int user_logout(MYSQL* mysqlDB, ts_userInfo info);
+	int user_tellOnline();
 public:
 	thread::id tid_work;
 	USER_DATA msg;

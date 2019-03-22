@@ -13,6 +13,8 @@ using namespace std;
 
 #define d_data_len	4096	//the max length of one message.
  
+void send_data(userInfo * user);
+
 class comm
 {
 public:
@@ -25,7 +27,8 @@ public:
 	bool thread_processAccept(int sock_cli);
 	void process_accept(void * arg);
 	void message_process(userInfo *user);
-	void send_data(userInfo *user);
+	friend void send_data(userInfo *user);
+	friend void send_data(int sockfd, userInfo * user);
 
 public:
 	int socket_AsS;//listen socket

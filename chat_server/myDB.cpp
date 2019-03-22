@@ -4,7 +4,7 @@
 #include "define.h"
 
 myDB db;
- 
+
 myDB::myDB(MYSQL* mysqlDB)
 {
 	mysqlDB = mysql_init(NULL);
@@ -35,7 +35,7 @@ myDB::myDB()
 
 
 myDB::~myDB()
-{ 
+{
 	cout << "~myDB()" << endl;
 }
 
@@ -104,7 +104,7 @@ bool myDB::ConnectDatabase(MYSQL* mysqlDB, string host, string user, string pwd,
 bool myDB::QueryDatabase1(MYSQL* mysqlDB)
 {
 	sprintf(query, "select * from %s", DB_TABLE); //执行查询语句，这里是查询所有，user是表名，不用加引号，用strcpy也可以
-	
+
 	mysql_query(mysqlDB, "set names gbk"); //设置编码格式（SET NAMES GBK也行），否则cmd下中文乱码
 	//返回0 查询成功，返回1查询失败
 	if (mysql_query(mysqlDB, query))        //执行SQL语句
@@ -192,7 +192,7 @@ void myDB::FreeConnect(MYSQL* mysqlDB)
 
 bool myDB::InsertData(MYSQL* mysqlDB, ts_userInfo info)
 {
-	sprintf(query, "insert into %s (account , passwd) value (\"%s\", \"%s\");", DB_TABLE, info.account, info.passwd);
+	sprintf(query, "insert into %s (account , passwd, name) values (\"%s\", \"%s\", \"%s\");", DB_TABLE, info.account, info.passwd, info.name);
 	cout << query;
 	if (mysql_query(mysqlDB, query))        //执行SQL语句
 	{
@@ -211,7 +211,7 @@ bool myDB::InsertData(MYSQL* mysqlDB, ts_userInfo info)
 bool myDB::AccountIsExists(MYSQL* mysqlDB, char * account)
 {
 	sprintf(query, "select * from %s where account=\'%s\'", DB_TABLE, account); //执行查询语句，这里是查询所有，user是表名，不用加引号，用strcpy也可以
-	cout << query<<endl;
+	cout << query << endl;
 	mysql_query(mysqlDB, "set names gbk"); //设置编码格式（SET NAMES GBK也行），否则cmd下中文乱码
 	//返回0 查询成功，返回1查询失败
 	if (mysql_query(mysqlDB, query))        //执行SQL语句
@@ -252,7 +252,7 @@ int myDB::CheckPasswd(MYSQL * mysqlDB, char * account, char * passwd)
 {
 	int ret = D_DB_ERROR;
 	sprintf(query, "select account,passwd from %s where account='%s'", DB_TABLE, account);
-	if ( mysql_query(mysqlDB, query) )
+	if (mysql_query(mysqlDB, query))
 	{
 		cout << "Query failed, Reason:" << mysql_error(mysqlDB);
 		ret = D_DB_ERROR;
@@ -276,13 +276,13 @@ int myDB::CheckPasswd(MYSQL * mysqlDB, char * account, char * passwd)
 					ret = D_PASSWD_ERROR;
 					cout << "Passwd error." << endl;
 				}
-			} 
+			}
 			else
 			{
 				cout << "CheckPasswd error." << endl;
 				ret = D_DB_ERROR;
 			}
-		} 
+		}
 		else
 		{
 			cout << "Couldn't get result from " << DB_TABLE << " Reason: " << mysql_error(mysqlDB);

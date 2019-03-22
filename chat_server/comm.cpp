@@ -167,13 +167,14 @@ void comm::process_accept(void *arg)
 		len = read(user->sock_fd, &user->msg, sizeof(user->msg));
 		if (len < 0)
 		{
-			myCout << "read message error!" << endl;
+			printf("COMM:Read message error, errno:%d, Reason:%s \n", errno, strerror(errno));
+			//myCout << "read message error!" << endl;
 			break;
 		}
 
 		else if (len == 0)
 		{
-			cout << "user close the socket !" << endl;
+			cout << "COMM:User close the socket !" << endl;
 			close(user->sock_fd);
 			//should delete user.
 			delete user;
@@ -183,7 +184,6 @@ void comm::process_accept(void *arg)
 		else
 		{
 			myCout << "recv message size:" << len << endl;
-
 			message_process(user);
 		}
 	}
@@ -206,7 +206,12 @@ void comm::message_process(userInfo *user)
 
 		if (user->msg.cmd == CMD_LOGINSUCCESS)
 		{
+			user->set_Account_name(user->msg.src_id);
+			
+			//Add to list of online user.
 			gc_OnlineUserMap.HashMap_Add(*user);
+			//Boadcast to online users.
+			gc_OnlineUserMap.HashMap_Travel(*user);
 		}
 		strcpy(user->msg.dst_id, user->msg.src_id);
 		send_data(user);
@@ -240,13 +245,22 @@ void comm::message_process(userInfo *user)
 
 }
 
-void comm::send_data(userInfo * user)
+void send_data(userInfo * user)
 {
+	cout << "sockfd:"<<user->sock_fd << endl;
 	if (write(user->sock_fd, &user->msg, sizeof(user->msg)) < 0)
 	{
 		cout << "Error:send_data failed , Reason:" << strerror(errno) << endl;
 	}
+}
 
+void send_data(int sockfd, userInfo * user)
+{
+	cout << "sockfd:" << sockfd  << endl;
+	if (write(sockfd, &user->msg, sizeof(user->msg)) < 0)
+	{
+		cout << "Error:send_data failed , Reason:" << strerror(errno) << endl;
+	}
 
 }
 
