@@ -207,14 +207,19 @@ void comm::message_process(userInfo *user)
 		if (user->msg.cmd == CMD_LOGINSUCCESS)
 		{
 			user->set_Account_name(user->msg.src_id);
-			
+
 			//Add to list of online user.
 			gc_OnlineUserMap.HashMap_Add(*user);
-			//Boadcast to online users.
-			gc_OnlineUserMap.HashMap_Travel(*user);
 		}
 		strcpy(user->msg.dst_id, user->msg.src_id);
 		send_data(user);
+		usleep(500 * 1000);//wait 500 milliseconds to complete client initialization.  ===
+		if (user->msg.cmd == CMD_LOGINSUCCESS)
+		{
+			//Boadcast to online users.
+			gc_OnlineUserMap.HashMap_Travel(*user);
+		}
+
 		break;
 	case CMD_REGISTER:
 		cout << "REGISTER: User register!" << endl;
@@ -229,15 +234,22 @@ void comm::message_process(userInfo *user)
 		send_data(user);
 		break;
 	case CMD_USERDATA:
-		//gc_OnlineUserMap.HashMap_getUser(user->msg.src_id);
+	{
+		int sockFd = gc_OnlineUserMap.HashMap_getUserSockFd(user->msg.dst_id);
 		
+		send_data(sockFd, user->msg);
 		break;
+
+	}
 	case CMD_CLOSECHAT:
+		cout << "The user that name is " << user->get_Account_name() << " logout." << endl;
 		user->msg.cmd = user->user_logout(db.mysql, info);
-		if (user->msg.cmd == D_USER_ONLINE)
-		{
-			gc_OnlineUserMap.HashMap_Del(*user);
-		}
+
+		//Del the info from online-list.
+		gc_OnlineUserMap.HashMap_Del(*user);
+		//Boadcast to online users.
+		gc_OnlineUserMap.HashMap_Travel(*user);
+
 		break;
 	default:
 		break;
@@ -250,8 +262,18 @@ void send_data(userInfo * user)
 	cout << "sockfd:"<<user->sock_fd << endl;
 	if (write(user->sock_fd, &user->msg, sizeof(user->msg)) < 0)
 	{
-		cout << "Error:send_data failed , Reason:" << strerror(errno) << endl;
+		cout << "Error:send_data(userInfo * user) failed , Reason:" << strerror(errno) << endl;
 	}
+}
+
+void send_data(int sockFd, USER_DATA data)
+{
+	if (write(sockFd, reinterpret_cast<char *>(&data), sizeof(USER_DATA)) < 0)
+	{
+		cout << "Error:send_data(sockFd, data) failed , Reason:" << strerror(errno) << endl;
+	}
+
+	return;
 }
 
 void send_data(int sockfd, userInfo * user)
@@ -259,7 +281,7 @@ void send_data(int sockfd, userInfo * user)
 	cout << "sockfd:" << sockfd  << endl;
 	if (write(sockfd, &user->msg, sizeof(user->msg)) < 0)
 	{
-		cout << "Error:send_data failed , Reason:" << strerror(errno) << endl;
+		cout << "Error:send_data(sockfd, user) failed , Reason:" << strerror(errno) << endl;
 	}
 
 }

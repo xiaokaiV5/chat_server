@@ -26,6 +26,8 @@ public:
 	size_t HashMap_Size();
 	//Get info of online user by account 
 	userInfo HashMap_getUser(char *account);
+	//Get file descriptor of target user.
+	int HashMap_getUserSockFd(char * account);
 
 	friend void send_data(userInfo *user);
 	friend void send_data(int sockfd, userInfo * user);

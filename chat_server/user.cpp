@@ -108,7 +108,8 @@ int userInfo::user_login(MYSQL * mysqlDB, ts_userInfo info)
 
 int userInfo::user_logout(MYSQL * mysqlDB, ts_userInfo info)
 {
-
+	//upgrade the last offline time.
+	//wait doing.
 	return D_USER_OFFLINE;
 }
 
